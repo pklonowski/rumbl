@@ -18,6 +18,10 @@ defmodule RumblWeb.Auth do
     |> configure_session(renew: true)
   end
 
+  def logout(conn) do
+    configure_session(conn, drop: true)
+  end
+
   def login_by_email_and_pass(conn, email, given_pass) do
     case Accounts.authenticate_by_email_and_pass(email, given_pass) do
       {:ok, user} -> {:ok, login(conn, user)}
@@ -26,7 +30,17 @@ defmodule RumblWeb.Auth do
     end
   end
 
-  def logout(conn) do
-    configure_session(conn, drop: true)
+  import Phoenix.Controller
+  alias RumblWeb.Router.Helpers, as: Routes
+
+  def authenticate_user(conn, _opts) do
+    if conn.assigns.current_user do
+      conn
+    else
+      conn
+      |> put_flash(:error, "You must be logged in to access that page")
+      |> redirect(to: Routes.page_path(conn, :index))
+      |> halt()
+    end
   end
 end
