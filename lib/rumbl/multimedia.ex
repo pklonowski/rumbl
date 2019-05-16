@@ -23,6 +23,18 @@ defmodule Rumbl.Multimedia do
     |> preload_user()
   end
 
+  alias Rumbl.Multimedia.Category
+
+  def create_category(name) do
+    Repo.get_by(Category, name: name) || Repo.insert!(%Category{name: name})
+  end
+
+  def list_alphabetical_categories do
+    Category
+    |> Category.alphabetical()
+    |> Repo.all()
+  end
+
   def list_user_videos(%Accounts.User{} = user) do
     Video
     |> user_videos_query(user)
